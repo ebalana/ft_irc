@@ -1,0 +1,258 @@
+=============================================================================
+  ft_irc - Manual Test Guide
+  Servidor: ./ircserv 6667 test
+  Herramienta: nc 127.0.0.1 6667  (en terminales separadas)
+=============================================================================
+
+Cada test indica qué escribir y qué respuesta esperar.
+Los comentarios con "-->" son lo que debe aparecer en tu terminal.
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  1. REGISTRO Y AUTENTICACIÓN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[Terminal A]
+  PASS test
+  NICK alice
+  USER alice 0 * alice
+  --> :localhost 001 alice :Welcome to the Internet Relay Network alice
+
+[Terminal A]
+  PASS wrongpassword
+  --> :localhost 464 * :Password incorrect
+
+[Terminal A - sin registrarse]
+  JOIN #test
+  --> :localhost 451 * :You have not registered
+
+[Terminal B - mismo nick que alice que sigue conectada]
+  PASS test
+  NICK alice
+  USER alice2 0 * alice2
+  --> :localhost 433 * alice :Nickname is already in use
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  2. JOIN BÁSICO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[Terminal A - ya registrado como alice]
+  JOIN #general
+  --> :alice!alice@localhost JOIN :#general
+  --> :localhost 331 alice :#general :No topic is set
+
+[Terminal B - registrado como bob]
+  PASS test
+  NICK bob
+  USER bob 0 * bob
+  JOIN #general
+  --> :bob!bob@localhost JOIN :#general    (alice también lo ve en su terminal)
+  --> :localhost 331 bob :#general :No topic is set
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  3. PRIVMSG
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[Terminal A - alice en #general]
+  PRIVMSG #general :Hola a todos
+  --> (bob en Terminal B ve): :alice!alice@localhost PRIVMSG #general :Hola a todos
+  --> (alice NO recibe su propio mensaje)
+
+[Terminal A]
+  PRIVMSG bob :Mensaje privado
+  --> (bob en Terminal B ve): :alice!alice@localhost PRIVMSG bob :Mensaje privado
+
+[Terminal A]
+  PRIVMSG #noexiste :hola
+  --> :localhost 403 alice :#noexiste :No such channel
+
+[Terminal A]
+  PRIVMSG fantasma :hola
+  --> :localhost 401 alice :fantasma :No such nick/channel
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  4. TOPIC
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ESCENARIO: alice es operadora de #general, bob es miembro normal.
+Por defecto el canal tiene +t activo (solo ops cambian topic).
+
+[Terminal B - bob intenta cambiar topic]
+  TOPIC #general :Tema de bob
+  --> :localhost 482 bob :#general :You're not channel operator
+
+[Terminal A - alice cambia topic]
+  TOPIC #general :Bienvenidos al canal
+  --> :alice!alice@localhost TOPIC #general :Bienvenidos al canal
+  --> (bob también lo ve en su terminal)
+
+[Terminal B - bob consulta topic]
+  TOPIC #general
+  --> :localhost 332 bob :#general :Bienvenidos al canal
+
+[Terminal A - alice desactiva restriccion de topic]
+  MODE #general -t
+  --> :alice MODE #general -t
+
+[Terminal B - bob ahora SÍ puede cambiar topic]
+  TOPIC #general :Tema libre
+  --> :bob!bob@localhost TOPIC #general :Tema libre
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  5. MODO +i (Invite Only)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ESCENARIO: alice crea #vip y activa +i. charlie intenta entrar sin invitación.
+Luego alice invita a charlie y charlie entra.
+
+[Terminal A - alice]
+  JOIN #vip
+  MODE #vip +i
+  --> :alice MODE #vip +i
+
+[Terminal C - charlie intenta entrar sin invitación]
+  PASS test
+  NICK charlie
+  USER charlie 0 * charlie
+  JOIN #vip
+  --> :localhost 473 charlie :#vip :Cannot join channel (+i)
+
+[Terminal A - alice invita a charlie]
+  INVITE charlie #vip
+  --> :localhost 341 alice :charlie #vip
+  --> (charlie en Terminal C ve): :alice!alice@localhost INVITE charlie :#vip
+
+[Terminal C - charlie ahora puede entrar]
+  JOIN #vip
+  --> :charlie!charlie@localhost JOIN :#vip
+
+[Terminal B - bob intenta activar +i sin ser op]
+  MODE #vip +i
+  --> :localhost 482 bob :#vip :You're not channel operator
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  6. MODO +k (Channel Key)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[Terminal A - alice crea #secreto y pone clave]
+  JOIN #secreto
+  MODE #secreto +k clave123
+  --> :alice MODE #secreto +k clave123
+
+[Terminal B - bob intenta entrar sin clave]
+  JOIN #secreto
+  --> :localhost 475 bob :#secreto :Cannot join channel (+k)
+
+[Terminal B - bob intenta entrar con clave incorrecta]
+  JOIN #secreto malaclave
+  --> :localhost 475 bob :#secreto :Cannot join channel (+k)
+
+[Terminal B - bob entra con clave correcta]
+  JOIN #secreto clave123
+  --> :bob!bob@localhost JOIN :#secreto
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  7. MODO +l (User Limit)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ESCENARIO: alice crea #sala con límite 2. bob entra (2/2). charlie no puede.
+
+[Terminal A - alice]
+  JOIN #sala
+  MODE #sala +l 2
+  --> :alice MODE #sala +l 2
+
+[Terminal B - bob entra, canal ahora lleno]
+  JOIN #sala
+  --> :bob!bob@localhost JOIN :#sala
+
+[Terminal C - charlie intenta entrar]
+  JOIN #sala
+  --> :localhost 471 charlie :#sala :Cannot join channel (+l)
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  8. MODO +o (Operator Privilege)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ESCENARIO: alice y bob están en #general. alice da op a bob. bob quita op a alice.
+
+[Terminal A - alice da op a bob]
+  MODE #general +o bob
+  --> :alice MODE #general +o bob
+  --> (bob también lo ve)
+
+[Terminal B - bob ahora es op, quita op a alice]
+  MODE #general -o alice
+  --> :bob MODE #general -o alice
+
+[Terminal A - alice intenta dar op a alguien sin ser op]
+  MODE #general +o charlie
+  --> :localhost 482 alice :#general :You're not channel operator
+
+[Terminal A - dar +o a usuario que no está en el canal]
+  MODE #general +o fantasma
+  --> :localhost 441 alice :fantasma #general :They aren't on that channel
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  9. KICK
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ESCENARIO: alice es op en #general, bob es miembro normal.
+
+[Terminal B - bob intenta kickear a alice sin ser op]
+  KICK #general alice :fuera
+  --> :localhost 482 bob :#general :You're not channel operator
+
+[Terminal A - alice kickea a bob con razón]
+  KICK #general bob :Comportamiento inapropiado
+  --> :alice!alice@localhost KICK #general bob :Comportamiento inapropiado
+  --> (bob ve el mensaje y queda expulsado del canal)
+
+[Terminal A - alice intenta kickear a alguien que no existe en el canal]
+  KICK #general fantasma :fuera
+  --> :localhost 441 alice :fantasma #general :They aren't on that channel
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  10. MODOS INVÁLIDOS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[Terminal A]
+  MODE #general +z
+  --> :localhost 472 alice :z :is unknown mode char to me
+
+[Terminal A]
+  MODE #noexiste +i
+  --> :localhost 403 alice :#noexiste :No such channel
+
+
+=============================================================================
+  RESUMEN DE ERRORES ESPERADOS
+=============================================================================
+
+  001  Welcome (registro correcto)
+  331  No topic is set
+  332  Topic actual del canal
+  341  RPL_INVITING (invitación enviada)
+  401  No such nick/channel
+  403  No such channel
+  433  Nickname already in use
+  441  User not in channel
+  451  Not registered
+  461  Not enough parameters
+  464  Password incorrect
+  471  Channel is full (+l)
+  472  Unknown mode
+  473  Invite only channel (+i)
+  475  Bad channel key (+k)
+  482  You're not channel operator
+
+=============================================================================
