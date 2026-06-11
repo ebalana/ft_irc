@@ -17,6 +17,7 @@
 #include <cstring>   // Para std::memset
 #include <arpa/inet.h> // Para inet_ntoa
 #include <map>
+#include <cerrno>
 
 class Server 
 {

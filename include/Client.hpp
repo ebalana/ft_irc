@@ -11,6 +11,7 @@ class Client
 		std::string	_username;
 		std::string	_buffer;       // El buffer donde acumularemos los retazos de texto
 		bool		_isRegistered; // Para saber si ya completó el PASS, NICK y USER
+		bool		_hasValidPassword; // Saber si la password es valida
 
 	public:
 		Client(int fd);
@@ -30,6 +31,9 @@ class Client
 
 		bool isRegistered() const;
 		void setRegistered(bool value);
+
+		bool hasValidPassword() const;
+		void setValidPassword(bool value);
 };
 
 #endif

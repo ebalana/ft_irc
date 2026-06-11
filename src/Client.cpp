@@ -22,3 +22,6 @@ void Client::clearBuffer() { _buffer.clear(); }
 
 bool Client::isRegistered() const { return _isRegistered; }
 void Client::setRegistered(bool value) { _isRegistered = value; }
+
+bool Client::hasValidPassword() const { return _hasValidPassword; }
+void Client::setValidPassword(bool value) { _hasValidPassword = value; }

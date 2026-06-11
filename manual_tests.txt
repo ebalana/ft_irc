@@ -13,14 +13,12 @@ Los comentarios con "-->" son lo que debe aparecer en tu terminal.
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 [Terminal A]
-  PASS test
-  NICK alice
-  USER alice 0 * alice
-  --> :localhost 001 alice :Welcome to the Internet Relay Network alice
-
-[Terminal A]
   PASS wrongpassword
   --> :localhost 464 * :Password incorrect
+
+[Terminal A]
+  PASS test
+  NICK alice
 
 [Terminal A - sin registrarse]
   JOIN #test
@@ -29,7 +27,6 @@ Los comentarios con "-->" son lo que debe aparecer en tu terminal.
 [Terminal B - mismo nick que alice que sigue conectada]
   PASS test
   NICK alice
-  USER alice2 0 * alice2
   --> :localhost 433 * alice :Nickname is already in use
 
 
@@ -38,12 +35,13 @@ Los comentarios con "-->" son lo que debe aparecer en tu terminal.
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 [Terminal A - ya registrado como alice]
+  USER alice 0 * alice
+  --> :localhost 001 alice :Welcome to the Internet Relay Network alice	
   JOIN #general
   --> :alice!alice@localhost JOIN :#general
   --> :localhost 331 alice :#general :No topic is set
 
 [Terminal B - registrado como bob]
-  PASS test
   NICK bob
   USER bob 0 * bob
   JOIN #general
@@ -196,7 +194,7 @@ ESCENARIO: alice y bob están en #general. alice da op a bob. bob quita op a ali
   MODE #general +o charlie
   --> :localhost 482 alice :#general :You're not channel operator
 
-[Terminal A - dar +o a usuario que no está en el canal]
+[Terminal B - dar +o a usuario que no está en el canal]
   MODE #general +o fantasma
   --> :localhost 441 alice :fantasma #general :They aren't on that channel
 
