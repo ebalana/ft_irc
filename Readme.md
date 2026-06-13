@@ -1,4 +1,4 @@
-*This project has been created as part of the 42 curriculum by <your_login_here>.*
+*This project has been created as part of the 42 curriculum by <ebalana-> and <dcampas->.
 
 # ft_irc
 
@@ -150,12 +150,15 @@ ft_irc/
 - [Beej's Guide to Network Programming](https://beej.us/guide/bgnet/)
 - `man poll`, `man fcntl`, `man socket`
 
+
 ### AI usage
 
-<!-- TODO: edit this section to accurately describe how AI was used in YOUR project -->
+AI (Claude/Gemini) was used during this project to reduce repetitive tasks and assist with the following specific areas:
 
-AI (Claude, by Anthropic) was used during this project for:
+Network Debugging: Assisting in identifying the root cause of an infinite loop caused by client CTRL+D disconnections. The AI helped clarify the relationship between recv() returning 0, the POLLHUP flag in poll(), and safe file descriptor cleanup.
 
-- ...
+Architecture Refactoring: Providing a clean directory structure blueprint (core/, network/, commands/) and updating the Makefile to transition away from a single bloated Server.cpp file into isolated command modules.
 
-All AI-assisted code was reviewed, tested manually (with `nc` and an IRC client) and understood before being kept in the final submission.
+Testing Automation: Generating a bash testing script (test_modes.sh) to automate repetitive Netcat connections and validate the strict behavior of all required channel modes (+i, +k, +l, +o, +t).
+
+All AI-generated insights were reviewed, tested manually with nc and a reference client, and thoroughly understood to take full responsibility during the evaluation phase.
