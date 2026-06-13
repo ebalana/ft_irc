@@ -108,7 +108,7 @@ It can also be tested with a real IRC client such as **Irssi**, **HexChat**, or 
 
 To simulate fragmented input (as described in the subject), data can be sent in several chunks using `Ctrl+D` with `nc -C`.
 
-### Bonnus: File Transfer (DCC) Netcat to Netcat
+### Bonus: File Transfer (DCC) Netcat to Netcat
 
 **Step 1: Host the file**
 Sender must open a **new terminal window** and inject the file into it.
@@ -133,7 +133,7 @@ The receiver opens a **new terminal window**, connects to the provided IP and po
 nc 127.0.0.1 5000 > downloaded_myfile.txt
 ```
 
-### Bonnus: File Transfer (DCC) Irssi to Netcat
+### Bonus: File Transfer (DCC) Irssi to Netcat
 
 **Step 1: Send the file from irssi**
 The sender must use the built-in DCC command in their `irssi` client:
