@@ -1,11 +1,6 @@
 #include "../include/Client.hpp"
 
-Client::Client(int fd) : _fd(fd), _isRegistered(false) {
-    _nickname = "";
-    _username = "";
-    _buffer = "";
-}
-
+Client::Client(int fd) : _fd(fd), _isRegistered(false) { _nickname = ""; _username = ""; _buffer = ""; }
 Client::~Client() {}
 
 int Client::getFd() const { return _fd; }

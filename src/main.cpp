@@ -1,9 +1,5 @@
 #include "../include/Server.hpp"
 
-/**
- * Valida que el puerto sea un número y esté en el rango correcto (1024 - 65535).
- * Los puertos por debajo de 1024 requieren permisos de superusuario (root).
- */
 bool isValidPort(const std::string& portStr) {
 	if (portStr.empty()) return false;
 
@@ -15,8 +11,8 @@ bool isValidPort(const std::string& portStr) {
 	return (port >= 1024 && port <= 65535);
 }
 
-int main(int argc, char** argv) {
-	// Requisito del subject: ./ircserv <port> <password>
+int main(int argc, char** argv) 
+{
 	if (argc != 3) {
 		std::cerr << "Error: Uso correcto: ./ircserv <port> <password>" << std::endl;
 		return 1;
@@ -38,16 +34,13 @@ int main(int argc, char** argv) {
 	std::cout << "--- Iniciando ft_irc Servidor ---" << std::endl;
 
 	try {
-		// Aquí instanciamos e iniciamos nuestro servidor
 		Server ircServer(port, password);
-		ircServer.init(); // Configura los sockets
-		ircServer.run();  // Bucle infinito de poll()
+		ircServer.init();
+		ircServer.run();
 	} 
 	catch (const std::exception& e) {
-		// Requisito del subject: El programa no debe crashear bajo ninguna circunstancia
 		std::cerr << "Error crítico del servidor: " << e.what() << std::endl;
 		return 1;
 	}
-
 	return 0;
 }

@@ -18,7 +18,7 @@ void Channel::addMember(Client* client)
 void Channel::removeMember(int fd) 
 {
 	_members.erase(fd);
-	_operators.erase(fd); // Si era operador, también lo quitamos de aquí
+	_operators.erase(fd);
 }
 
 bool Channel::isMember(int fd) const {
@@ -39,10 +39,6 @@ bool Channel::isOperator(int fd) const {
 
 size_t Channel::getMemberCount() const { return _members.size(); }
 
-/**
- * Envía un mensaje a todos los miembros del canal.
- * El parámetro excludeFd sirve para que el usuario que envía el mensaje no lo reciba duplicado.
- */
 void Channel::broadcast(const std::string& message, int excludeFd) 
 {
 	std::map<int, Client*>::iterator it;
@@ -60,7 +56,6 @@ size_t Channel::getUserLimit() const { return _userLimit; }
 
 void Channel::addInvitation(const std::string& nick) 
 {
-	// Si el nick no está ya en el vector de invitados, lo añadimos
 	if (std::find(_invitedUsers.begin(), _invitedUsers.end(), nick) == _invitedUsers.end()) {
 		_invitedUsers.push_back(nick);
 	}
