@@ -10,7 +10,7 @@ CXXFLAGS = -Werror -Wall -Wextra -std=c++98
 RM = rm -f
 
 HEADERS = include/Server.hpp include/Client.cpp include/Channel.hpp
-SRCS = src/main.cpp  src/Server.cpp src/Client.cpp src/Channel.cpp src/Execute/Invite.cpp src/Execute/Join.cpp src/Execute/Kick.cpp src/Execute/Mode.cpp src/Execute/Nick.cpp src/Execute/Pass.cpp src/Execute/Privmsg.cpp src/Execute/Topic.cpp src/Execute/User.cpp
+SRCS = src/main.cpp  src/Server.cpp src/Client.cpp src/Channel.cpp src/commands/Invite.cpp src/commands/Join.cpp src/commands/Kick.cpp src/commands/Mode.cpp src/commands/Nick.cpp src/commands/Pass.cpp src/commands/Privmsg.cpp src/commands/Topic.cpp src/commands/User.cpp
 OBJS = $(SRCS:.cpp=.o)
 
 all: $(NAME)
