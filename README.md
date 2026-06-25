@@ -24,6 +24,7 @@ The project does **not** implement an IRC client and does **not** implement serv
 - Channel modes (`MODE`): `i`, `t`, `k`, `l`, `o`.
 - Partial/fragmented message handling (buffered input, reassembled on `\n`).
 - The server never crashes or exits unexpectedly, even on malformed input.
+- Personal Study Notes: [My Notion Notes](https://app.notion.com/p/vienatrip/ft_irc-37a00fe299ed80d9b434e82c49a0f36c?source=copy_link)
 
 ## Architecture overview
 
